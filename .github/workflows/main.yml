@@ -1,0 +1,38 @@
+name: Pipeline Sistemas Distribuidos
+
+on: [push]
+
+jobs:
+  # Estágio 1: Análise de Código (Lint)
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Linting Tool
+        run: pip install flake8
+      - name: Run Lint
+        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  # Estágio 2: Execução de Testes
+  test:
+    needs: lint  # Só roda se o lint passar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Tests
+        run: |
+          python -m unittest test_app.py
+
+  # Estágio 3: Build/Simulação de Deploy
+  deploy:
+    needs: test  # Só roda se os testes passarem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simulating Deployment
+        run: |
+          echo "Empacotando aplicação..."
+          echo "Deploy realizado com sucesso no ambiente de staging!"
